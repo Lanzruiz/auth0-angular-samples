@@ -37,11 +37,18 @@ jobs:
 
 
       # Get from app/cache
+      - restore_cache:
+         keys:
+           - app-{{ checksum "01-Login/package-lock.json" }}
       - run:
           name: Build pull request
           command: npm install
           working_directory: 01-Login
       # Save to app/cache
+      - save_cache:
+          key: app-{{ checksum "01-Login/package-lock.json" }}
+          paths:
+            - "01-Login/node_modules"
       - run:
           name: Run pull request
           command: npm start
@@ -54,6 +61,9 @@ jobs:
           # --retry-connrefused option is available on later curl versions
 
       # Get from test/cache
+      - restore_cache:
+         keys:
+           - test-{{ checksum "scripts/package-lock.json" }}
       - run:
           name: Prepare tests
           command: |
@@ -61,6 +71,10 @@ jobs:
             cd scripts
             npm install
       # Save to test/cache
+      - save_cache:
+          key: test-{{ checksum "scripts/package-lock.json" }}
+          paths:
+            - "scripts/node_modules"
       - run:
           name: Run tests
           command: node scripts/test.js
